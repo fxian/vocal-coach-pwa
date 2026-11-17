@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#4f46e5" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Vocal Coach Studio</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    :root {
+      --bg-main: #020617;
+      --bg-card: #0f172a;
+      --bg-input: #1e293b;
+      --border: #1e293b;
+      --border-light: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --indigo: #4f46e5;
+      --indigo-hover: #6366f1;
+      --indigo-light: #818cf8;
+      --cyan: #22d3ee;
+      --emerald: #34d399;
+      --rose: #e11d48;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+      padding-bottom: 3rem;
+      line-height: 1.5;
+    }
+    .container { max-width: 48rem; margin: 0 auto; padding: 1.5rem 1rem 0; }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(to right, var(--indigo-light), var(--cyan));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle { font-size: 0.75rem; color: var(--text-muted); }
+    .btn {
+      border: none;
+      border-radius: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s ease;
+      color: #fff;
+    }
+    .btn-primary { background: var(--indigo); padding: 0.5rem 0.75rem; font-size: 0.75rem; }
+    .btn-primary:hover { background: var(--indigo-hover); }
+    .btn-full { width: 100%; padding: 0.875rem; font-size: 1rem; }
+    .btn-rose { background: var(--rose); }
+    .btn-secondary { background: var(--bg-input); padding: 0.625rem 1.25rem; font-size: 0.875rem; }
+    .btn-secondary:hover { background: var(--border-light); }
+    .hidden { display: none !important; }
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 1rem;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+    .row-between { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; }
+    .label-xs { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-muted); font-weight: 600; }
+    select, input[type="number"], input[type="text"], textarea {
+      background: var(--bg-input);
+      border: 1px solid var(--border-light);
+      border-radius: 0.5rem;
+      color: var(--text-main);
+      padding: 0.4rem 0.75rem;
+      font-size: 0.875rem;
+      outline: none;
+    }
+    input[type="text"], textarea { width: 100%; background: var(--bg-main); margin-bottom: 0.75rem; }
+    input[type="number"] { width: 100%; text-align: center; padding: 0.3rem; }
+    .grid-2 { display: grid; grid-template-columns: 1fr; gap: 1rem; padding-top: 0.75rem; margin-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.75rem; }
+    @media (min-width: 640px) { .grid-2 { grid-template-columns: 1fr 1fr; } }
+    .range-inputs { display: flex; align-items: center; gap: 0.5rem; margin-top: 0.25rem; }
+    .mono-indigo { font-family: monospace; color: var(--indigo-light); }
+    .mono-cyan { font-family: monospace; color: var(--cyan); }
+    .tabs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.5rem;
+      background: var(--bg-card);
+      padding: 0.25rem;
+      border-radius: 0.75rem;
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+    }
+    .tab-btn {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .tab-btn.active { background: var(--indigo); color: #fff; }
+    .prompt-box {
+      background: rgba(2, 6, 23, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 0.75rem;
+      padding: 0.75rem;
+      font-size: 0.875rem;
+      color: #cbd5e1;
+      margin-top: 0.5rem;
+    }
+    .metrics-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.75rem; margin: 1.25rem 0; text-align: center; }
+    .metric-card { background: var(--bg-main); padding: 0.75rem; border-radius: 0.75rem; border: 1px solid var(--border); }
+    .metric-title { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+    .metric-val { font-size: 1.25rem; font-weight: 700; font-family: monospace; }
+    .metric-sub { font-size: 0.7rem; color: #64748b; margin-top: 0.15rem; }
+    .bar-bg { width: 100%; height: 0.625rem; background: var(--bg-input); border-radius: 9999px; overflow: hidden; margin-bottom: 1.25rem; }
+    .bar-fill { height: 100%; width: 0%; background: linear-gradient(to right, var(--indigo), var(--cyan)); transition: width 75ms linear; }
+    .breath-circle {
+      width: 8rem;
+      height: 8rem;
+      margin: 1rem auto;
+      border-radius: 9999px;
+      border: 4px solid var(--indigo);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--indigo-light);
+      transition: transform 1s ease;
+    }
+    .drill-item { background: var(--bg-main); border: 1px solid var(--border); border-radius: 0.75rem; padding: 0.75rem; font-size: 0.875rem; margin-top: 0.75rem; }
+    .script-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 0.75rem; padding: 1rem; display: flex; justify-content: space-between; align-items: flex-start; gap: 0.75rem; margin-bottom: 0.75rem; }
+    .link-btn { background: none; border: none; color: var(--text-muted); font-size: 0.75rem; text-decoration: underline; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>Vocal Coach Studio</h1>
+        <p class="subtitle">Personal Speech, Pitch &amp; Articulation Trainer</p>
+      </div>
+      <button id="installBtn" class="btn btn-primary hidden">+ Install App</button>
+    </header>
+
+    <section class="card">
+      <div class="row-between">
+        <label class="label-xs" for="trackSelect">Specialized Track</label>
+        <select id="trackSelect">
+          <option value="leadership">Executive Leadership</option>
+          <option value="presentation">Public Presentation</option>
+          <option value="recovery">Speech Clarity &amp; Recovery</option>
+          <option value="feminization">Voice Feminization</option>
+          <option value="masculinization">Voice Masculinization</option>
+        </select>
+      </div>
+
+      <div class="grid-2">
+        <div>
+          <div class="row-between">
+            <span>Target Pitch Range (Hz)</span>
+            <span id="pitchRangeLabel" class="mono-indigo">105 - 165 Hz</span>
+          </div>
+          <div class="range-inputs">
+            <input type="number" id="minPitch" value="105" min="60" max="350" />
+            <span>to</span>
+            <input type="number" id="maxPitch" value="165" min="70" max="400" />
+          </div>
+        </div>
+        <div>
+          <div class="row-between">
+            <span>Target Pace (WPM)</span>
+            <span id="paceRangeLabel" class="mono-cyan">125 - 155 WPM</span>
+          </div>
+          <div class="range-inputs">
+            <input type="number" id="minPace" value="125" min="60" max="220" />
+            <span>to</span>
+            <input type="number" id="maxPace" value="155" min="80" max="250" />
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <nav class="tabs">
+      <button onclick="switchTab('analyzer')" id="tab-analyzer" class="tab-btn active">Live Analyzer</button>
+      <button onclick="switchTab('warmups')" id="tab-warmups" class="tab-btn">Warm-Ups</button>
+      <button onclick="switchTab('scripts')" id="tab-scripts" class="tab-btn">Role-Play &amp; Drills</button>
+    </nav>
+
+    <main id="view-analyzer">
+      <div class="card">
+        <div class="row-between" style="margin-bottom: 0.5rem;">
+          <span class="label-xs" style="color: var(--indigo-light);">Active Prompt</span>
+          <button onclick="switchTab('scripts')" class="link-btn">Change Script</button>
+        </div>
+        <p id="activePromptTitle" style="font-weight: 600;">Boardroom Vision Pitch</p>
+        <p id="activePromptText" class="prompt-box">
+          "Our objective this quarter isn't just incremental growth—it's setting a clear, sustainable standard that our entire team can stand behind with confidence."
+        </p>
+
+        <div class="metrics-grid">
+          <div class="metric-card">
+            <div class="metric-title">Live Pitch</div>
+            <div id="livePitch" class="metric-val" style="color: var(--indigo-light);">-- Hz</div>
+            <div id="pitchStatus" class="metric-sub">Waiting</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Est. Pace</div>
+            <div id="livePace" class="metric-val" style="color: var(--cyan);">-- WPM</div>
+            <div id="paceStatus" class="metric-sub">Waiting</div>
+          </div>
+          <div class="metric-card">
+            <div class="metric-title">Clarity / Energy</div>
+            <div id="liveClarity" class="metric-val" style="color: var(--emerald);">-- %</div>
+            <div id="clarityStatus" class="metric-sub">Waiting</div>
+          </div>
+        </div>
+
+        <div class="bar-bg">
+          <div id="volumeBar" class="bar-fill"></div>
+        </div>
+
+        <button id="recordBtn" onclick="toggleRecording()" class="btn btn-primary btn-full">
+          Start Live Voice Analysis
+        </button>
+      </div>
+
+      <div id="feedbackCard" class="card hidden" style="border-color: rgba(99, 102, 241, 0.5);">
+        <h3 style="color: var(--indigo-light); margin-bottom: 0.5rem;">Session Feedback Report</h3>
+        <p id="feedbackSummary" style="font-size: 0.875rem; color: #cbd5e1;"></p>
+      </div>
+    </main>
+
+    <section id="view-warmups" class="hidden">
+      <div class="card" style="text-align: center;">
+        <h2 style="font-size: 1.125rem; margin-bottom: 0.25rem;">Box Breathing Timer (4-4-4-4)</h2>
+        <p class="subtitle">Stabilizes subglottic air pressure and reduces vocal tension.</p>
+        <div id="breathCircle" class="breath-circle">Ready</div>
+        <button id="breathBtn" onclick="toggleBreathing()" class="btn btn-secondary">
+          Start Breathing Cycle
+        </button>
+      </div>
+
+      <div class="card">
+        <h3 style="font-size: 1rem;">Daily 3-Minute Vocal Routine</h3>
+        <div class="drill-item">
+          <strong style="color: var(--indigo-light);">1. Lip Trills (60s):</strong> Gently blow air through closed, relaxed lips while sliding pitch smoothly from low to high.
+        </div>
+        <div class="drill-item">
+          <strong style="color: var(--cyan);">2. Resonance Hum (60s):</strong> Hum an "Mmm" sound focusing on vibration in your lips and nasal bridge without throat strain.
+        </div>
+        <div class="drill-item">
+          <strong style="color: var(--emerald);">3. Tongue Twister Articulation (60s):</strong> Over-enunciate: <em>"Unique New York, red leather yellow leather, crisp crusts crackle."</em>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-scripts" class="hidden">
+      <div class="card">
+        <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Create Custom Role-Play Script</h3>
+        <input id="customTitle" type="text" placeholder="Script Title (e.g., Job Interview Intro)" />
+        <textarea id="customBody" rows="3" placeholder="Paste or write your speech, interview answer, or tongue twister..."></textarea>
+        <button onclick="saveCustomScript()" class="btn btn-primary" style="padding: 0.6rem 1rem; font-size: 0.875rem;">
+          Save &amp; Use Script
+        </button>
+      </div>
+
+      <div id="scriptList"></div>
+    </section>
+  </div>
+
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js').catch(() => {});
+    }
+
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      document.getElementById('installBtn').classList.remove('hidden');
+    });
+
+    document.getElementById('installBtn').addEventListener('click', async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt = null;
+        document.getElementById('installBtn').classList.add('hidden');
+      }
+    });
+
+    const trackPresets = {
+      leadership: { minP: 105, maxP: 165, minW: 125, maxW: 155 },
+      presentation: { minP: 120, maxP: 190, minW: 135, maxW: 165 },
+      recovery: { minP: 110, maxP: 200, minW: 110, maxW: 140 },
+      feminization: { minP: 185, maxP: 255, minW: 135, maxW: 170 },
+      masculinization: { minP: 85, maxP: 135, minW: 120, maxW: 150 }
+    };
+
+    const trackSelect = document.getElementById('trackSelect');
+    const minPitchEl = document.getElementById('minPitch');
+    const maxPitchEl = document.getElementById('maxPitch');
+    const minPaceEl = document.getElementById('minPace');
+    const maxPaceEl = document.getElementById('maxPace');
+
+    function updateRangeLabels() {
+      document.getElementById('pitchRangeLabel').textContent = `${minPitchEl.value} - ${maxPitchEl.value} Hz`;
+      document.getElementById('paceRangeLabel').textContent = `${minPaceEl.value} - ${maxPaceEl.value} WPM`;
+    }
+
+    trackSelect.addEventListener('change', () => {
+      const p = trackPresets[trackSelect.value];
+      minPitchEl.value = p.minP;
+      maxPitchEl.value = p.maxP;
+      minPaceEl.value = p.minW;
+      maxPaceEl.value = p.maxW;
+      updateRangeLabels();
+    });
+
+    [minPitchEl, maxPitchEl, minPaceEl, maxPaceEl].forEach(el => el.addEventListener('input', updateRangeLabels));
+
+    const defaultScripts = [
+      { title: "Boardroom Vision Pitch", text: "Our objective this quarter isn't just incremental growth—it's setting a clear, sustainable standard that our entire team can stand behind with confidence." },
+      { title: "Articulation Tongue Twister", text: "Six sleek swans swam swiftly southwards while crisp autumn leaves crackled cleanly beneath their feet." },
+      { title: "Salary Negotiation Role-Play", text: "Based on the measurable impact I've delivered over the past year, I'd like to discuss aligning my compensation with the upper market range for this role." }
+    ];
+
+    let scripts = JSON.parse(localStorage.getItem('vocal_scripts')) || defaultScripts;
+
+    function renderScripts() {
+      const list = document.getElementById('scriptList');
+      list.innerHTML = scripts.map((s, idx) => `
+        <div class="script-item">
+          <div>
+            <h4 style="font-size: 0.875rem; font-weight: 600;">${s.title}</h4>
+            <p class="subtitle" style="margin-top: 0.25rem;">${s.text}</p>
+          </div>
+          <button onclick="selectScript(${idx})" class="btn btn-secondary" style="padding: 0.35rem 0.75rem; font-size: 0.75rem;">Practice</button>
+        </div>
+      `).join('');
+    }
+
+    function saveCustomScript() {
+      const title = document.getElementById('customTitle').value.trim();
+      const text = document.getElementById('customBody').value.trim();
+      if (!title || !text) return;
+      scripts.unshift({ title, text });
+      localStorage.setItem('vocal_scripts', JSON.stringify(scripts));
+      document.getElementById('customTitle').value = '';
+      document.getElementById('customBody').value = '';
+      renderScripts();
+      selectScript(0);
+    }
+
+    function selectScript(idx) {
+      document.getElementById('activePromptTitle').textContent = scripts[idx].title;
+      document.getElementById('activePromptText').textContent = `"${scripts[idx].text}"`;
+      switchTab('analyzer');
+    }
+
+    renderScripts();
+
+    function switchTab(tab) {
+      ['analyzer', 'warmups', 'scripts'].forEach(t => {
+        document.getElementById(`view-${t}`).classList.toggle('hidden', t !== tab);
+        document.getElementById(`tab-${t}`).classList.toggle('active', t === tab);
+      });
+    }
+
+    let breathInterval = null;
+    function toggleBreathing() {
+      const circle = document.getElementById('breathCircle');
+      const btn = document.getElementById('breathBtn');
+      if (breathInterval) {
+        clearInterval(breathInterval);
+        breathInterval = null;
+        circle.textContent = 'Ready';
+        circle.style.transform = 'scale(1)';
+        btn.textContent = 'Start Breathing Cycle';
+        return;
+      }
+      const phases = [
+        { label: 'Inhale (4s)', scale: 'scale(1.2)' },
+        { label: 'Hold (4s)', scale: 'scale(1.2)' },
+        { label: 'Exhale (4s)', scale: 'scale(0.95)' },
+        { label: 'Hold (4s)', scale: 'scale(0.95)' }
+      ];
+      let step = 0;
+      btn.textContent = 'Stop Breathing Cycle';
+      const runPhase = () => {
+        circle.textContent = phases[step].label;
+        circle.style.transform = phases[step].scale;
+        step = (step + 1) % phases.length;
+      };
+      runPhase();
+      breathInterval = setInterval(runPhase, 4000);
+    }
+
+    let audioCtx, analyser, micStream, animId, isRecording = false;
+    let pitchSamples = [], syllableCount = 0, wasAboveThreshold = false, startTime = 0;
+
+    function autoCorrelate(buf, sampleRate) {
+      let SIZE = buf.length;
+      let rms = 0;
+      for (let i = 0; i < SIZE; i++) rms += buf[i] * buf[i];
+      rms = Math.sqrt(rms / SIZE);
+      if (rms < 0.015) return -1;
+
+      let r1 = 0, r2 = SIZE - 1, thres = 0.2;
+      for (let i = 0; i < SIZE / 2; i++) if (Math.abs(buf[i]) < thres) { r1 = i; break; }
+      for (let i = 1; i < SIZE / 2; i++) if (Math.abs(buf[SIZE - i]) < thres) { r2 = SIZE - i; break; }
+      buf = buf.slice(r1, r2);
+      SIZE = buf.length;
+
+      let c = new Array(SIZE).fill(0);
+      for (let i = 0; i < SIZE; i++)
+        for (let j = 0; j < SIZE - i; j++) c[i] = c[i] + buf[j] * buf[j + i];
+
+      let d = 0;
+      while (c[d] > c[d + 1]) d++;
+      let maxval = -1, maxpos = -1;
+      for (let i = d; i < SIZE; i++) {
+        if (c[i] > maxval) { maxval = c[i]; maxpos = i; }
+      }
+      return sampleRate / maxpos;
+    }
+
+    async function toggleRecording() {
+      const btn = document.getElementById('recordBtn');
+      if (isRecording) {
+        isRecording = false;
+        cancelAnimationFrame(animId);
+        if (micStream) micStream.getTracks().forEach(t => t.stop());
+        btn.textContent = 'Start Live Voice Analysis';
+        btn.classList.remove('btn-rose');
+        showReport();
+        return;
+      }
+
+      try {
+        micStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const source = audioCtx.createMediaStreamSource(micStream);
+        analyser = audioCtx.createAnalyser();
+        analyser.fftSize = 2048;
+        source.connect(analyser);
+
+        isRecording = true;
+        pitchSamples = [];
+        syllableCount = 0;
+        startTime = Date.now();
+        document.getElementById('feedbackCard').classList.add('hidden');
+        btn.textContent = 'Stop & Generate Feedback';
+        btn.classList.add('btn-rose');
+
+        const buf = new Float32Array(analyser.fftSize);
+        const loop = () => {
+          if (!isRecording) return;
+          analyser.getFloatTimeDomainData(buf);
+
+          let sum = 0;
+          for (let i = 0; i < buf.length; i++) sum += buf[i] * buf[i];
+          const rms = Math.sqrt(sum / buf.length);
+          const volPct = Math.min(100, Math.round(rms * 450));
+          document.getElementById('volumeBar').style.width = `${volPct}%`;
+
+          if (rms > 0.03 && !wasAboveThreshold) {
+            syllableCount++;
+            wasAboveThreshold = true;
+          } else if (rms < 0.018) {
+            wasAboveThreshold = false;
+          }
+
+          const elapsedMin = (Date.now() - startTime) / 60000;
+          if (elapsedMin > 0.03) {
+            const estWpm = Math.round((syllableCount / 1.5) / elapsedMin);
+            document.getElementById('livePace').textContent = `${estWpm} WPM`;
+            const minW = +minPaceEl.value, maxW = +maxPaceEl.value;
+            document.getElementById('paceStatus').textContent =
+              estWpm < minW ? 'Too Slow' : estWpm > maxW ? 'Too Fast' : 'On Target';
+          }
+
+          const pitch = autoCorrelate(buf, audioCtx.sampleRate);
+          if (pitch > 65 && pitch < 400) {
+            const p = Math.round(pitch);
+            pitchSamples.push(p);
+            document.getElementById('livePitch').textContent = `${p} Hz`;
+            const minP = +minPitchEl.value, maxP = +maxPitchEl.value;
+            document.getElementById('pitchStatus').textContent =
+              p < minP ? 'Below Target' : p > maxP ? 'Above Target' : 'In Range';
+          }
+
+          const clarity = Math.min(99, Math.max(40, Math.round(65 + volPct * 0.35)));
+          if (volPct > 8) {
+            document.getElementById('liveClarity').textContent = `${clarity}%`;
+            document.getElementById('clarityStatus').textContent = clarity > 80 ? 'Crisp' : 'Project More';
+          }
+
+          animId = requestAnimationFrame(loop);
+        };
+        loop();
+      } catch (err) {
+        alert('Microphone access is required for live voice analysis. Ensure you are running on HTTPS or localhost.');
+      }
+    }
+
+    function showReport() {
+      const card = document.getElementById('feedbackCard');
+      const summary = document.getElementById('feedbackSummary');
+      card.classList.remove('hidden');
+
+      if (pitchSamples.length < 5) {
+        summary.textContent = 'Not enough speech detected. Try speaking closer to your microphone for at least 3–5 seconds.';
+        return;
+      }
+      const avgPitch = Math.round(pitchSamples.reduce((a, b) => a + b, 0) / pitchSamples.length);
+      const minP = +minPitchEl.value, maxP = +maxPitchEl.value;
+      const pitchVerdict = avgPitch >= minP && avgPitch <= maxP
+        ? `right inside your target range (${minP}–${maxP} Hz)`
+        : avgPitch < minP ? `slightly lower than your ${minP} Hz target` : `slightly higher than your ${maxP} Hz target`;
+
+      summary.textContent = `Your average speaking pitch was ${avgPitch} Hz, which is ${pitchVerdict}. Keep your jaw relaxed and maintain steady breath support from your diaphragm for consistent projection.`;
+    }
+  </script>
+</body>
+</html>
